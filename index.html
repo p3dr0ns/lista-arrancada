@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Arrancada</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #222;
+            color: white;
+            margin: 0;
+            padding: 0;
+            transition: background 0.3s, color 0.3s;
+        }
+        .light-mode {
+            background-color: #f4f4f4;
+            color: black;
+        }
+        h1 {
+            color: #FFD700;
+            margin-top: 20px;
+        }
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background-color: #333;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.1);
+            transition: background 0.3s;
+        }
+        .light-mode .container {
+            background-color: white;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #444;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .light-mode table {
+            background-color: white;
+        }
+        th, td {
+            border: 1px solid #555;
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #555;
+        }
+        .light-mode th {
+            background-color: #ddd;
+        }
+        button {
+            margin: 5px;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s, transform 0.2s;
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+        .btn-add { background-color: #28a745; color: white; }
+        .btn-clear { background-color: #dc3545; color: white; }
+        .btn-backup { background-color: #007bff; color: white; }
+        .btn-restore { background-color: #17a2b8; color: white; }
+        .btn-theme { background-color: #6c757d; color: white; }
+        .btn-move { background-color: #ffc107; }
+        .btn-remove { background-color: #dc3545; color: white; }
+        .btn-share { background-color: #25D366; color: white; }
+        .btn-draw { background-color: #ff5722; color: white; }
+        .btn-menu { background-color: #6c757d; color: white; }
+        input[type="text"] {
+            padding: 10px;
+            width: 80%;
+            font-size: 16px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+        @media (max-width: 480px) {
+            button { font-size: 14px; padding: 8px; }
+            th, td { padding: 8px; }
+        }
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #333;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .modal-content button {
+            margin: 10px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Lista de Arrancada</h1>
+    <div class="container">
+        <div id="menu">
+            <button class="btn-menu" onclick="mostrarLista('principal')">Lista Principal</button>
+            <button class="btn-menu" onclick="mostrarLista('sharkTank')">Shark Tank</button>
+        </div>
+        <input type="text" id="nomeCompetidor" placeholder="Nome do competidor">
+        <button class="btn-add" onclick="adicionarCompetidor()">Adicionar</button>
+        <button class="btn-share" onclick="compartilharWhatsApp()">Compartilhar no WhatsApp</button>
+        <button class="btn-draw" onclick="realizarSorteio()">Realizar Sorteio</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>Posição</th>
+                    <th>Nome</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="listaCompetidores"></tbody>
+        </table>
+        <button class="btn-clear" onclick="mostrarModal()">Limpar Lista</button>
+        <button class="btn-backup" onclick="exportarCSV()">Fazer Backup</button>
+        <button class="btn-restore" onclick="restaurarBackup()">Restaurar Backup</button>
+    </div>
+
+    <!-- Modal -->
+    <div id="modalConfirmacao" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="fecharModal()">&times;</span>
+            <p>Tem certeza que deseja limpar a lista?</p>
+            <button class="btn-clear" onclick="limparLista()">Sim</button>
+            <button class="btn-theme" onclick="fecharModal()">Não</button>
+        </div>
+    </div>
+    
+    <script>
+        let competidores = JSON.parse(localStorage.getItem('competidores')) || [];
+        let competidoresSharkTank = JSON.parse(localStorage.getItem('competidoresSharkTank')) || [];
+        let listaAtual = 'principal';
+
+        function atualizarLista() {
+            const tabela = document.getElementById('listaCompetidores');
+            tabela.innerHTML = '';
+            const lista = listaAtual === 'principal' ? competidores : competidoresSharkTank;
+            lista.forEach((nome, index) => {
+                tabela.innerHTML += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td contenteditable="true" onblur="editarNome(${index}, this.innerText)">${nome}</td>
+                        <td>
+                            <button class="btn-move" onclick="moverCima(${index})">⬆️</button>
+                            <button class="btn-move" onclick="moverBaixo(${index})">⬇️</button>
+                            <button class="btn-remove" onclick="removerCompetidor(${index})">❌</button>
+                        </td>
+                    </tr>`;
+            });
+            localStorage.setItem(listaAtual === 'principal' ? 'competidores' : 'competidoresSharkTank', JSON.stringify(lista));
+        }
+
+        function exportarCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,Posição,Nome\n";
+            const lista = listaAtual === 'principal' ? competidores : competidoresSharkTank;
+            lista.forEach((nome, index) => {
+                csvContent += `${index + 1},${nome}\n`;
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", listaAtual === 'principal' ? "lista_arrancada.csv" : "lista_shark_tank.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function restaurarBackup() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.csv';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = event => {
+                    const csv = event.target.result;
+                    const lines = csv.split('\n').slice(1);
+                    const lista = lines.map(line => line.split(',')[1]).filter(nome => nome);
+                    if (listaAtual === 'principal') {
+                        competidores = lista;
+                    } else {
+                        competidoresSharkTank = lista;
+                    }
+                    atualizarLista();
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function moverCima(index) {
+            const lista = listaAtual === 'principal' ? competidores : competidoresSharkTank;
+            if (index > 0) {
+                [lista[index], lista[index - 1]] = [lista[index - 1], lista[index]];
+                atualizarLista();
+            }
+        }
+
+        function moverBaixo(index) {
+            const lista = listaAtual === 'principal' ? competidores : competidoresSharkTank;
+            if (index < lista.length - 1) {
+                [lista[index], lista[index + 1]] = [lista[index + 1], lista[index]];
+                atualizarLista();
+            }
+        }
+
+        function adicionarCompetidor() {
+            const nome = document.getElementById('nomeCompetidor').value.trim();
+            if (!nome) {
+                alert('Por favor, insira um nome válido.');
+                return;
+            }
+            if (listaAtual === 'principal') {
+                competidores.push(nome);
+            } else {
+                competidoresSharkTank.push(nome);
+            }
+            document.getElementById('nomeCompetidor').value = '';
+            atualizarLista();
+        }
+
+        function compartilharWhatsApp() {
+            let mensagem = listaAtual === 'principal' ? "Lista de Arrancada:\n" : "Lista Shark Tank:\n";
+            const lista = listaAtual === 'principal' ? competidores : competidoresSharkTank;
+            lista.forEach((nome, index) => {
+                mensagem += `${index + 1}. ${nome}\n`;
+            });
+            const encodedMessage = encodeURIComponent(mensagem);
+            const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        function realizarSorteio() {
+            const lista = listaAtual === 'principal' ? competidores : competidoresSharkTank;
+            if (lista.length === 0) {
+                alert('A lista está vazia.');
+                return;
+            }
+
+            let listaCopy = [...lista];
+            let pares = [];
+            let passeLivre = null;
+
+            // Embaralhar a lista de competidores
+            for (let i = listaCopy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [listaCopy[i], listaCopy[j]] = [listaCopy[j], listaCopy[i]];
+            }
+
+            // Formar pares
+            while (listaCopy.length > 1) {
+                const competidor1 = listaCopy.pop();
+                const competidor2 = listaCopy.pop();
+                pares.push([competidor1, competidor2]);
+            }
+
+            // Verificar se há um competidor sem par
+            if (listaCopy.length === 1) {
+                passeLivre = listaCopy.pop();
+            }
+
+            // Gerar mensagem para WhatsApp
+            let mensagem = "Sorteio de Pares:\n";
+            pares.forEach((par, index) => {
+                mensagem += `Par ${index + 1}: ${par[0]} vs ${par[1]}\n`;
+            });
+            if (passeLivre) {
+                mensagem += `\nPasse Livre: ${passeLivre}\n`;
+            }
+
+            alert(mensagem);
+            const encodedMessage = encodeURIComponent(mensagem);
+            const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        function mostrarModal() {
+            document.getElementById('modalConfirmacao').style.display = 'block';
+        }
+
+        function fecharModal() {
+            document.getElementById('modalConfirmacao').style.display = 'none';
+        }
+
+        function limparLista() {
+            if (listaAtual === 'principal') {
+                competidores = [];
+            } else {
+                competidoresSharkTank = [];
+            }
+            atualizarLista();
+            fecharModal();
+        }
+
+        function alternarTema() {
+            document.body.classList.toggle('light-mode');
+        }
+
+        function mostrarLista(lista) {
+            listaAtual = lista;
+            atualizarLista();
+        }
+
+        atualizarLista();
+    </script>
+</body>
+</html>
