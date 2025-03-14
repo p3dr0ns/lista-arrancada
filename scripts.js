@@ -6,11 +6,12 @@ function atualizarLista() {
     const tabela = document.getElementById('listaCompetidores');
     tabela.innerHTML = '';
     const lista = listaAtual === 'principal' ? competidores : competidoresSharkTank;
-    lista.forEach((nome, index) => {
+    lista.forEach((competidor, index) => {
         tabela.innerHTML += `
             <tr>
                 <td>${index + 1}</td>
-                <td contenteditable="true" onblur="editarNome(${index}, this.innerText)">${nome}</td>
+                <td contenteditable="true" onblur="editarNome(${index}, this.innerText)">${competidor.nome}</td>
+                <td contenteditable="true" onblur="editarCarro(${index}, this.innerText)">${competidor.carro}</td>
                 <td>
                     <button class="btn-move" onclick="moverCima(${index})">⬆️</button>
                     <button class="btn-move" onclick="moverBaixo(${index})">⬇️</button>
@@ -22,10 +23,10 @@ function atualizarLista() {
 }
 
 function exportarCSV() {
-    let csvContent = "data:text/csv;charset=utf-8,Posição,Nome\n";
+    let csvContent = "data:text/csv;charset=utf-8,Posição,Nome,Carro\n";
     const lista = listaAtual === 'principal' ? competidores : competidoresSharkTank;
-    lista.forEach((nome, index) => {
-        csvContent += `${index + 1},${nome}\n`;
+    lista.forEach((competidor, index) => {
+        csvContent += `${index + 1},${competidor.nome},${competidor.carro}\n`;
     });
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
@@ -46,7 +47,10 @@ function restaurarBackup() {
         reader.onload = event => {
             const csv = event.target.result;
             const lines = csv.split('\n').slice(1);
-            const lista = lines.map(line => line.split(',')[1]).filter(nome => nome);
+            const lista = lines.map(line => {
+                const [posicao, nome, carro] = line.split(',');
+                return { nome, carro };
+            }).filter(competidor => competidor.nome && competidor.carro);
             if (listaAtual === 'principal') {
                 competidores = lista;
             } else {
@@ -77,24 +81,27 @@ function moverBaixo(index) {
 
 function adicionarCompetidor() {
     const nome = document.getElementById('nomeCompetidor').value.trim();
-    if (!nome) {
-        alert('Por favor, insira um nome válido.');
+    const carro = document.getElementById('nomeCarro').value.trim();
+    if (!nome || !carro) {
+        alert('Por favor, insira um nome e um carro válidos.');
         return;
     }
+    const competidor = { nome, carro };
     if (listaAtual === 'principal') {
-        competidores.push(nome);
+        competidores.push(competidor);
     } else {
-        competidoresSharkTank.push(nome);
+        competidoresSharkTank.push(competidor);
     }
     document.getElementById('nomeCompetidor').value = '';
+    document.getElementById('nomeCarro').value = '';
     atualizarLista();
 }
 
 function compartilharWhatsApp() {
     let mensagem = listaAtual === 'principal' ? "Lista de Arrancada:\n" : "Lista Shark Tank:\n";
     const lista = listaAtual === 'principal' ? competidores : competidoresSharkTank;
-    lista.forEach((nome, index) => {
-        mensagem += `${index + 1}. ${nome}\n`;
+    lista.forEach((competidor, index) => {
+        mensagem += `${index + 1}. ${competidor.nome} (${competidor.carro})\n`;
     });
     const encodedMessage = encodeURIComponent(mensagem);
     const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
@@ -133,10 +140,10 @@ function realizarSorteio() {
     // Gerar mensagem para WhatsApp
     let mensagem = "Sorteio de Pares:\n";
     pares.forEach((par, index) => {
-        mensagem += `Par ${index + 1}: ${par[0]} vs ${par[1]}\n`;
+        mensagem += `Par ${index + 1}: ${par[0].nome} (${par[0].carro}) vs ${par[1].nome} (${par[1].carro})\n`;
     });
     if (passeLivre) {
-        mensagem += `\nPasse Livre: ${passeLivre}\n`;
+        mensagem += `\nPasse Livre: ${passeLivre.nome} (${passeLivre.carro})\n`;
     }
 
     alert(mensagem);
@@ -216,7 +223,13 @@ function mostrarLista(lista) {
 
 function editarNome(index, novoNome) {
     const lista = listaAtual === 'principal' ? competidores : competidoresSharkTank;
-    lista[index] = novoNome;
+    lista[index].nome = novoNome;
+    localStorage.setItem(listaAtual === 'principal' ? 'competidores' : 'competidoresSharkTank', JSON.stringify(lista));
+}
+
+function editarCarro(index, novoCarro) {
+    const lista = listaAtual === 'principal' ? competidores : competidoresSharkTank;
+    lista[index].carro = novoCarro;
     localStorage.setItem(listaAtual === 'principal' ? 'competidores' : 'competidoresSharkTank', JSON.stringify(lista));
 }
 
@@ -237,19 +250,19 @@ function iniciarRodada(rodada) {
     if (rodada === 1 || rodada === 3 || rodada === 5) {
         // Rodada Par x Ímpar
         for (let i = 0; i < lista.length - 1; i += 2) {
-            mensagem += `${i + 2}º x ${i + 1}º: ${lista[i + 1]} vs ${lista[i]}\n`;
+            mensagem += `${i + 2}º x ${i + 1}º: ${lista[i + 1].nome} (${lista[i + 1].carro}) vs ${lista[i].nome} (${lista[i].carro})\n`;
         }
         if (lista.length % 2 === 1) {
-            mensagem += `\nO último colocado (Ímpar) não terá desafiante: ${lista[lista.length - 1]}\n`;
+            mensagem += `\nO último colocado (Ímpar) não terá desafiante: ${lista[lista.length - 1].nome} (${lista[lista.length - 1].carro})\n`;
         }
     } else if (rodada === 2 || rodada === 4) {
         // Rodada Ímpar x Par
         mensagem += `O 1º colocado não corre nesta rodada.\n`;
         for (let i = 2; i < lista.length; i += 2) {
-            mensagem += `${i + 1}º x ${i}º: ${lista[i]} vs ${lista[i - 1]}\n`;
+            mensagem += `${i + 1}º x ${i}º: ${lista[i].nome} (${lista[i].carro}) vs ${lista[i - 1].nome} (${lista[i - 1].carro})\n`;
         }
         if (lista.length % 2 === 0) {
-            mensagem += `\nO último colocado (Par) não terá desafiante: ${lista[lista.length - 1]}\n`;
+            mensagem += `\nO último colocado (Par) não terá desafiante: ${lista[lista.length - 1].nome} (${lista[lista.length - 1].carro})\n`;
         }
     }
 
