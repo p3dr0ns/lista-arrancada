@@ -5,92 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Arrancada</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="all.min.css">
-    <link rel="icon" href="car-icon.png" type="image/png">
 </head>
 <body>
-    <h1>Lista de Arrancada</h1>
+    <div class="header">
+        <button class="config-button" onclick="toggleConfiguracoes()">⚙️</button>
+        <h1>Lista de Arrancada</h1>
+    </div>
+    <div id="config-modal" class="config-modal">
+        <h2>Configurações</h2>
+        <button class="btn-backup" onclick="backup()">Backup</button>
+        <button class="btn-restaurar" onclick="restaurar()">Restaurar</button>
+        <button class="btn-fechar" onclick="toggleConfiguracoes()">Fechar</button>
+    </div>
     <div class="container">
-        <div id="menu">
-            <button class="btn-menu" onclick="mostrarLista('principal')">Lista Principal</button>
-            <button class="btn-menu btn-shark" onclick="mostrarLista('sharkTank')">Shark Tank</button>
+        <div class="left">
+            <div id="listaPilotos"></div>
+            <div id="rodadas"></div>
         </div>
-        <div class="content">
-            <div class="buttons">
-                <input type="text" id="nomeCompetidor" placeholder="Nome do competidor">
-                <input type="text" id="nomeCarro" placeholder="Nome do carro">
-                <button class="btn-add" onclick="adicionarCompetidor()">Adicionar</button>
-                <button class="btn-share" onclick="compartilharWhatsApp()">Compartilhar no WhatsApp</button>
-                <button class="btn-draw" onclick="realizarSorteio()">Realizar Sorteio</button>
-                <button class="btn-rounds" onclick="mostrarModalRodadas()">Rodadas</button>
+        <div class="right">
+            <div class="input-container">
+                <input type="text" id="nomePiloto" placeholder="Nome do Piloto">
+                <button onclick="adicionarPiloto()">Adicionar Piloto</button>
             </div>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Posição</th>
-                            <th>Nome</th>
-                            <th>Carro</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="listaCompetidores"></tbody>
-                </table>
+            <div class="button-container">
+                <button onclick="exibirRodadas(1)">Rodada 1° - Par X Impar</button>
+                <button onclick="exibirRodadas(2)">Rodada 2° - Impar X Par</button>
+                <button onclick="exibirRodadas(3)">Rodada 3° - Par X Impar</button>
+                <button onclick="exibirRodadas(4)">Rodada 4° - Impar X Par</button>
+                <button onclick="exibirRodadas(5)">Rodada 5° - Par X Impar</button>
             </div>
         </div>
     </div>
-
-    <!-- Ícone de Menu -->
-    <div id="menuIcon" onclick="toggleMenu()">
-        <i class="fas fa-cog"></i>
-    </div>
-
-    <!-- Modal de Configurações -->
-    <div id="modalConfiguracoes" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="fecharModalConfiguracoes()">&times;</span>
-            <button class="btn-theme" onclick="mostrarModalTema()">Tema</button>
-            <button class="btn-clear" onclick="mostrarModal()">Limpar Lista</button>
-            <button class="btn-backup" onclick="exportarCSV()">Fazer Backup</button>
-            <button class="btn-restore" onclick="restaurarBackup()">Restaurar Backup</button>
-        </div>
-    </div>
-
-    <!-- Modal de Confirmação -->
-    <div id="modalConfirmacao" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="fecharModal()">&times;</span>
-            <p>Tem certeza que deseja limpar a lista?</p>
-            <button class="btn-clear" onclick="limparLista()">Sim</button>
-            <button class="btn-theme" onclick="fecharModal()">Não</button>
-        </div>
-    </div>
-
-    <!-- Modal de Rodadas -->
-    <div id="modalRodadas" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="fecharModalRodadas()">&times;</span>
-            <p>Escolha a rodada:</p>
-            <button class="btn-round" onclick="iniciarRodada(1)">Rodada 1 (Par x Ímpar)</button>
-            <button class="btn-round" onclick="iniciarRodada(2)">Rodada 2 (Ímpar x Par)</button>
-            <button class="btn-round" onclick="iniciarRodada(3)">Rodada 3 (Par x Ímpar)</button>
-            <button class="btn-round" onclick="iniciarRodada(4)">Rodada 4 (Ímpar x Par)</button>
-            <button class="btn-round" onclick="iniciarRodada(5)">Rodada 5 (Par x Ímpar)</button>
-        </div>
-    </div>
-
-    <!-- Modal de Tema -->
-    <div id="modalTema" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="fecharModalTema()">&times;</span>
-            <p>Escolha o tema:</p>
-            <label class="switch">
-                <input type="checkbox" id="toggleTema" onclick="alternarTema()">
-                <span class="slider round"></span>
-            </label>
-        </div>
-    </div>
-    
     <script src="scripts.js"></script>
 </body>
 </html>

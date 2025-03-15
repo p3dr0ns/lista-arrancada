@@ -5,231 +5,208 @@ body {
     color: white;
     margin: 0;
     padding: 0;
-    transition: background 0.3s, color 0.3s;
 }
-.light-mode {
-    background-color: #f4f4f4;
-    color: black;
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background-color: #333;
+    position: relative;
 }
-h1 {
-    color: #FFD700;
-    margin-top: 20px;
+
+.config-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
 }
+
+.config-button:hover {
+    color: #ccc;
+}
+
+.config-modal {
+    display: none;
+    position: absolute;
+    top: 50px;
+    left: 20px;
+    background-color: #444;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.config-modal h2 {
+    margin-top: 0;
+}
+
+.config-modal button {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.config-modal .btn-backup {
+    background-color: #28a745;
+    color: #ffffff;
+}
+
+.config-modal .btn-backup:hover {
+    background-color: #218838;
+}
+
+.config-modal .btn-restaurar {
+    background-color: #ffc107;
+    color: #000000;
+}
+
+.config-modal .btn-restaurar:hover {
+    background-color: #e0a800;
+}
+
+.config-modal .btn-fechar {
+    background-color: #dc3545;
+    color: #ffffff;
+}
+
+.config-modal .btn-fechar:hover {
+    background-color: #c82333;
+}
+
 .container {
     width: 90%;
-    max-width: 1200px;
+    max-width: 800px;
     margin: auto;
     padding: 20px;
     background-color: #333;
     border-radius: 10px;
-    box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.1);
-    transition: background 0.3s;
-}
-.light-mode .container {
-    background-color: white;
-}
-.content {
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
 }
-.buttons {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    margin-right: 20px;
+
+.left, .right {
+    width: 45%;
 }
-.buttons button, .buttons input[type="text"] {
-    margin-bottom: 10px;
-    width: 200px;
-}
-.table-container {
-    flex-grow: 1;
-}
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    background-color: #444;
-    border-radius: 10px;
-    overflow: hidden;
-}
-.light-mode table {
-    background-color: white;
-}
-th, td {
-    border: 1px solid #555;
-    padding: 12px;
+
+.input-container, .button-container {
     text-align: center;
+    margin: 20px;
 }
-th {
-    background-color: #555;
-}
-.light-mode th {
-    background-color: #ddd;
-}
-button {
+
+#rodadas, #listaPilotos {
+    margin: 20px auto;
     padding: 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+    border: 1px solid #555;
+    background-color: #444;
+    width: 100%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
-button:hover {
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-}
-button:active {
-    transform: scale(0.95);
-}
-.btn-add { background-color: #28a745; color: white; }
-.btn-clear { background-color: #dc3545; color: white; }
-.btn-backup { background-color: #007bff; color: white; }
-.btn-restore { background-color: #17a2b8; color: white; }
-.btn-theme { background-color: #6c757d; color: white; }
-.btn-move { background-color: #ffc107; }
-.btn-remove { background-color: #dc3545; color: white; }
-.btn-share { background-color: #25D366; color: white; }
-.btn-draw { background-color: #ff5722; color: white; }
-.btn-menu { background-color: #6c757d; color: white; }
-.btn-shark { background-color: #007bff; color: white; }
-.btn-rounds { background-color: #ff5722; color: white; }
+
 input[type="text"] {
     padding: 10px;
-    font-size: 16px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    text-align: center;
+    width: 200px;
+    margin-right: 10px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background-color: #333;
+    color: #ffffff;
 }
+
+button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #007BFF;
+    color: #ffffff;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 5px;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.piloto-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+}
+
+.piloto-item .buttons {
+    display: flex;
+    gap: 5px;
+}
+
+.piloto-item .remove {
+    background: none;
+    border: none;
+    color: #ffc107;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.piloto-item .remove:hover {
+    color: #e0a800;
+}
+
+.piloto-item .move-up {
+    background: none;
+    border: none;
+    color: #28a745;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.piloto-item .move-up:hover {
+    color: #218838;
+}
+
+.piloto-item .move-down {
+    background: none;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.piloto-item .move-down:hover {
+    color: #c82333;
+}
+
+/* Media Queries for Responsiveness */
 @media (max-width: 768px) {
-    .content {
+    .container {
         flex-direction: column;
         align-items: center;
     }
-    .buttons {
-        align-items: center;
-        margin-right: 0;
-    }
-    .buttons button, .buttons input[type="text"] {
+
+    .left, .right {
         width: 100%;
     }
-}
-@media (max-width: 480px) {
-    h1 {
-        font-size: 24px;
+
+    .input-container, .button-container {
+        width: 100%;
     }
+
+    input[type="text"] {
+        width: calc(100% - 20px);
+        margin: 10px 0;
+    }
+
     button {
-        font-size: 14px;
-        padding: 8px;
+        width: calc(100% - 20px);
+        margin: 10px 0;
     }
-    th, td {
-        padding: 8px;
-    }
-}
-/* Modal styles */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgb(0,0,0);
-    background-color: rgba(0,0,0,0.4);
-    padding-top: 60px;
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
-}
-.modal.show {
-    opacity: 1;
-}
-.modal-content {
-    background-color: #333;
-    margin: 5% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 400px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-    text-align: center;
-    transition: transform 0.3s ease-in-out;
-}
-.light-mode .modal-content {
-    background-color: white;
-}
-.modal.show .modal-content {
-    transform: translateY(0);
-}
-.modal.hide .modal-content {
-    transform: translateY(-100%);
-}
-.modal-content button {
-    margin: 10px;
-}
-.close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-}
-.close:hover,
-.close:focus {
-    color: #000;
-    text-decoration: none;
-    cursor: pointer;
-}
-/* Switch styles */
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
-}
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
-    border-radius: 34px;
-}
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    transition: .4s;
-    border-radius: 50%;
-}
-input:checked + .slider {
-    background-color: #2196F3;
-}
-input:checked + .slider:before {
-    transform: translateX(26px);
-}
-/* Menu Icon styles */
-#menuIcon {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    font-size: 24px;
-    cursor: pointer;
-    color: white;
-    z-index: 1000;
-}
-.light-mode #menuIcon {
-    color: black;
 }
