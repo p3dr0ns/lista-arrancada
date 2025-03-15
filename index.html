@@ -5,37 +5,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Arrancada</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Adicione o SDK do Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js"></script>
 </head>
 <body>
     <div class="header">
-        <button class="config-button" onclick="toggleConfiguracoes()">⚙️</button>
         <h1>Lista de Arrancada</h1>
     </div>
-    <div id="config-modal" class="config-modal">
-        <h2>Configurações</h2>
-        <button class="btn-backup" onclick="backup()">Backup</button>
-        <button class="btn-restaurar" onclick="restaurar()">Restaurar</button>
-        <button class="btn-fechar" onclick="toggleConfiguracoes()">Fechar</button>
+    <div class="form-container" id="auth-container">
+        <form id="login-form">
+            <h2>Login</h2>
+            <input type="text" id="login-email" placeholder="Email" required>
+            <input type="password" id="login-password" placeholder="Password" required>
+            <button type="submit">Login</button>
+            <p>Não tem uma conta? <a href="#" onclick="showRegisterForm()">Cadastre-se</a></p>
+        </form>
+        <form id="register-form" style="display: none;">
+            <h2>Registro</h2>
+            <input type="text" id="register-email" placeholder="Email" required>
+            <input type="password" id="register-password" placeholder="Password" required>
+            <button type="submit">Registrar</button>
+            <p>Já tem uma conta? <a href="#" onclick="showLoginForm()">Login</a></p>
+        </form>
     </div>
-    <div class="container">
-        <div class="left">
-            <div id="listaPilotos"></div>
-            <div id="rodadas"></div>
+    <div id="main-container" style="display: none;">
+        <div id="config-modal" class="config-modal">
+            <h2>Configurações</h2>
+            <button class="btn-backup" onclick="backup()">Backup</button>
+            <button class="btn-restaurar" onclick="restaurar()">Restaurar</button>
+            <button class="btn-tema" onclick="toggleTema()">Alternar Tema</button>
+            <button class="btn-fechar" onclick="toggleConfiguracoes()">Fechar</button>
         </div>
-        <div class="right">
-            <div class="input-container">
-                <input type="text" id="nomePiloto" placeholder="Nome do Piloto">
-                <button onclick="adicionarPiloto()">Adicionar Piloto</button>
+        <div class="container">
+            <div class="left">
+                <div id="listaPilotos"></div>
+                <div id="rodadas"></div>
             </div>
-            <div class="button-container">
-                <button onclick="exibirRodadas(1)">Rodada 1° - Par X Impar</button>
-                <button onclick="exibirRodadas(2)">Rodada 2° - Impar X Par</button>
-                <button onclick="exibirRodadas(3)">Rodada 3° - Par X Impar</button>
-                <button onclick="exibirRodadas(4)">Rodada 4° - Impar X Par</button>
-                <button onclick="exibirRodadas(5)">Rodada 5° - Par X Impar</button>
+            <div class="right">
+                <div class="input-container">
+                    <input type="text" id="nomePiloto" placeholder="Nome do Piloto" onkeypress="if(event.key === 'Enter') adicionarPiloto()">
+                    <button onclick="adicionarPiloto()">Adicionar Piloto</button>
+                </div>
+                <div class="button-container">
+                    <button onclick="exibirRodadas(1)">Rodada 1° - Par X Impar</button>
+                    <button onclick="exibirRodadas(2)">Rodada 2° - Impar X Par</button>
+                    <button onclick="exibirRodadas(3)">Rodada 3° - Par X Impar</button>
+                    <button onclick="exibirRodadas(4)">Rodada 4° - Impar X Par</button>
+                    <button onclick="exibirRodadas(5)">Rodada 5° - Par X Impar</button>
+                </div>
             </div>
         </div>
     </div>
     <script src="scripts.js"></script>
+    <script>
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBrrD_ogMwLk6rsf0imT40k-NusVMza4Yc",
+            authDomain: "lista-de-arrancada.firebaseapp.com",
+            projectId: "lista-de-arrancada",
+            storageBucket: "lista-de-arrancada.firebasestorage.app",
+            messagingSenderId: "763542045910",
+            appId: "1:763542045910:web:369fe626cbdec197d07577",
+            measurementId: "G-BBL3Q87PKJ"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+    </script>
 </body>
 </html>

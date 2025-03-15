@@ -1,13 +1,85 @@
+// Configuração do Firebase
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+
+// Inicializar Firebase
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+// Função para mostrar o formulário de registro
+function showRegisterForm() {
+    document.getElementById('login-form').style.display = 'none';
+    document.getElementById('register-form').style.display = 'block';
+}
+
+// Função para mostrar o formulário de login
+function showLoginForm() {
+    document.getElementById('register-form').style.display = 'none';
+    document.getElementById('login-form').style.display = 'block';
+}
+
+// Função para registrar usuário
+document.getElementById('register-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const email = document.getElementById('register-email').value;
+    const password = document.getElementById('register-password').value;
+
+    try {
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        await userCredential.user.sendEmailVerification();
+        alert('Usuário registrado com sucesso. Verifique seu email para ativar sua conta.');
+        showLoginForm();
+    } catch (error) {
+        alert('Erro ao registrar usuário: ' + error.message);
+    }
+});
+
+// Função para login de usuário
+document.getElementById('login-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+
+    try {
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        if (!userCredential.user.emailVerified) {
+            alert('Por favor, verifique seu email antes de fazer login.');
+            return;
+        }
+        alert('Login bem-sucedido');
+        document.getElementById('auth-container').style.display = 'none';
+        document.getElementById('main-container').style.display = 'block';
+        exibirPilotos();
+        exibirRodadas(1);
+    } catch (error) {
+        alert('Erro ao fazer login: ' + error.message);
+    }
+});
+
 // Função para adicionar piloto
 function adicionarPiloto() {
-    const nomePiloto = document.getElementById('nomePiloto').value;
-    if (nomePiloto) {
-        let pilotos = JSON.parse(localStorage.getItem('pilotos')) || [];
-        pilotos.push(nomePiloto);
-        localStorage.setItem('pilotos', JSON.stringify(pilotos));
-        document.getElementById('nomePiloto').value = '';
-        exibirPilotos();
+    const nomePiloto = document.getElementById('nomePiloto').value.trim();
+    if (!nomePiloto) {
+        alert('O nome do piloto não pode estar vazio.');
+        return;
     }
+
+    let pilotos = JSON.parse(localStorage.getItem('pilotos')) || [];
+    if (pilotos.includes(nomePiloto)) {
+        alert('Este piloto já está na lista.');
+        return;
+    }
+
+    pilotos.push(nomePiloto);
+    localStorage.setItem('pilotos', JSON.stringify(pilotos));
+    document.getElementById('nomePiloto').value = '';
+    exibirPilotos();
 }
 
 // Função para remover piloto
@@ -130,8 +202,30 @@ function restaurar() {
     input.click();
 }
 
+// Função para alternar entre temas claro e escuro
+function toggleTema() {
+    const body = document.body;
+    if (body.classList.contains('dark')) {
+        body.classList.remove('dark');
+        body.classList.add('light');
+    } else {
+        body.classList.remove('light');
+        body.classList.add('dark');
+    }
+}
+
 // Chama a função para exibir a lista de pilotos e as rodadas quando a página carrega
 window.onload = function() {
-    exibirPilotos();
-    exibirRodadas(1);
+    // Verifica se o usuário está autenticado
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            document.getElementById('auth-container').style.display = 'none';
+            document.getElementById('main-container').style.display = 'block';
+            exibirPilotos();
+            exibirRodadas(1);
+        } else {
+            document.getElementById('auth-container').style.display = 'block';
+            document.getElementById('main-container').style.display = 'none';
+        }
+    });
 };
