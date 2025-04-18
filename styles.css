@@ -1,72 +1,85 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Roboto', sans-serif;
     text-align: center;
     margin: 0;
     padding: 0;
+    transition: background-color 0.3s, color 0.3s;
+    overflow: hidden; /* Remove rolagem */
+    background: linear-gradient(135deg, #1e1e1e, #333); /* Fundo com gradiente */
 }
 
 body.dark {
-    background-color: #222;
-    color: white;
+    background-color: #000000;
+    color: #e0e0e0;
 }
 
 body.light {
-    background-color: #f0f0f0;
-    color: black;
+    background: linear-gradient(135deg, #f5f5f5, #e0e0e0); /* Fundo claro com gradiente */
 }
 
 .header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 20px;
-    background-color: #333;
+    padding: 15px 30px;
+    background-color: #444;
+    color: white;
     position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-bottom: 2px solid #007BFF;
+}
+
+.header img {
+    height: 50px;
+    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5)); /* Adiciona sombra para destacar */
+    transition: transform 0.3s, filter 0.3s;
+}
+
+.header img:hover {
+    transform: scale(1.1); /* Aumenta levemente no hover */
+    filter: drop-shadow(4px 4px 6px rgba(0, 0, 0, 0.7));
 }
 
 body.light .header {
-    background-color: #ddd;
+    background-color: #fff;
+    color: #333;
+    border-bottom: 2px solid #007BFF;
 }
 
 .config-button {
     background: none;
     border: none;
-    color: white;
+    color: inherit;
     font-size: 24px;
     cursor: pointer;
-}
-
-body.light .config-button {
-    color: black;
+    transition: color 0.3s;
 }
 
 .config-button:hover {
-    color: #ccc;
-}
-
-body.light .config-button:hover {
-    color: #333;
+    color: #007BFF;
 }
 
 .config-modal {
     display: none;
     position: absolute;
-    top: 50px;
-    left: 20px;
-    background-color: #444;
+    top: 60px;
+    right: 20px;
+    background-color: #000000;
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
     z-index: 1000;
+    transition: all 0.3s;
 }
 
 body.light .config-modal {
     background-color: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }
 
 .config-modal h2 {
     margin-top: 0;
+    font-size: 1.5em;
 }
 
 .config-modal button {
@@ -77,7 +90,7 @@ body.light .config-modal {
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    transition: background 0.3s;
+    transition: background 0.3s, color 0.3s;
 }
 
 .config-modal .btn-backup {
@@ -117,107 +130,147 @@ body.light .config-modal {
 }
 
 .container {
-    width: 90%;
-    max-width: 800px;
-    margin: auto;
-    padding: 20px;
-    background-color: #333;
-    border-radius: 10px;
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
+    width: 100%; /* Usa a largura total da tela */
+    height: calc(100vh - 60px); /* Usa a altura total da tela menos a altura do header */
+    margin: 0;
+    padding: 10px;
+    display: grid; /* Usa grid layout para melhor organização */
+    grid-template-columns: 1fr 1fr 1fr; /* Divide em três colunas iguais */
+    gap: 10px; /* Reduz o espaçamento entre as colunas */
+    box-sizing: border-box;
+    transition: background-color 0.3s, border 0.3s;
 }
 
 body.light .container {
     background-color: #fff;
-    border: 1px solid #ddd;
 }
 
-.left, .right {
-    width: 45%;
+.left, .middle, .right {
+    overflow: hidden; /* Remove rolagem interna */
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.8); /* Fundo semitransparente */
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Distribui o conteúdo verticalmente */
+}
+
+body.light .left, body.light .middle, body.light .right {
+    background: rgba(255, 255, 255, 0.9);
+    color: #000000;
 }
 
 .input-container, .button-container {
     text-align: center;
-    margin: 20px;
+    margin: 5px auto; /* Reduz a margem para economizar espaço */
+    width: 100%;
 }
 
-#rodadas, #listaPilotos {
-    margin: 20px auto;
-    padding: 10px;
+#rodadas, #listaPilotos, #sharkTank {
+    flex-grow: 1; /* Faz os elementos ocuparem o espaço disponível */
+    overflow-y: auto; /* Adiciona rolagem apenas se necessário */
+    margin: 5px 0;
+    padding: 5px;
     border: 1px solid #555;
-    background-color: #444;
+    background-color: #000000;
     width: 100%;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    transition: background-color 0.3s, border 0.3s, box-shadow 0.3s;
 }
 
-body.light #rodadas, body.light #listaPilotos {
+body.light #rodadas, body.light #listaPilotos, body.light #sharkTank {
     background-color: #f9f9f9;
     border: 1px solid #ddd;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+#rodadas {
+    margin-top: 10px; /* Reduz a margem para economizar espaço */
+    width: 100%;
+}
+
 input[type="text"] {
-    padding: 10px;
-    width: 200px;
-    margin-right: 10px;
-    border: 1px solid #555;
-    border-radius: 4px;
-    background-color: #333;
+    padding: 5px;
+    width: 90%; /* Ajusta o tamanho para caber na tela */
+    margin: 5px 0;
+    border: 2px solid #007BFF;
+    border-radius: 5px;
+    background-color: #1e1e1e;
     color: #ffffff;
+    font-size: 14px;
+    transition: border-color 0.3s, background-color 0.3s;
 }
 
 body.light input[type="text"] {
-    background-color: #fff;
-    color: #000;
-    border: 1px solid #ddd;
+    background-color: #ffffff;
+    color: #000000;
+    border-color: #007BFF;
+}
+
+input[type="text"]:focus {
+    border-color: #0056b3;
+    outline: none;
 }
 
 button {
-    padding: 10px 20px;
+    padding: 8px 15px;
     border: none;
     background-color: #007BFF;
     color: #ffffff;
-    border-radius: 4px;
+    border-radius: 5px;
     cursor: pointer;
     margin: 5px;
-    transition: background 0.3s;
+    font-size: 14px;
+    transition: background 0.3s, transform 0.2s;
 }
 
 button:hover {
     background-color: #0056b3;
+    transform: scale(1.05);
 }
 
-.piloto-item {
+.piloto-item, .shark-tank-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 5px 0;
+    padding: 5px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    font-size: 14px; /* Reduz o tamanho da fonte */
 }
 
-.piloto-item .buttons {
+body.light .piloto-item, body.light .shark-tank-item {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.piloto-item .buttons, .shark-tank-item .buttons {
     display: flex;
-    gap: 5px;
+    gap: 10px;
+}
+
+.piloto-item .remove, .piloto-item .move-up, .piloto-item .move-down {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    transition: color 0.3s;
 }
 
 .piloto-item .remove {
-    background: none;
-    border: none;
-    color: #ffc107;
-    cursor: pointer;
-    font-size: 18px;
+    background-color: #ffc107;
+    color: #000000;
 }
 
 .piloto-item .remove:hover {
-    color: #e0a800;
+    background-color: #e0a800;
 }
 
 .piloto-item .move-up {
-    background: none;
-    border: none;
     color: #28a745;
-    cursor: pointer;
-    font-size: 18px;
 }
 
 .piloto-item .move-up:hover {
@@ -225,26 +278,75 @@ button:hover {
 }
 
 .piloto-item .move-down {
-    background: none;
-    border: none;
     color: #dc3545;
-    cursor: pointer;
-    font-size: 18px;
 }
 
 .piloto-item .move-down:hover {
     color: #c82333;
 }
 
-/* Media Queries for Responsiveness */
+.piloto-item .ganhou {
+    background: none;
+    border: none;
+    color: #28a745; /* Verde */
+    cursor: pointer;
+    font-size: 18px;
+    transition: color 0.3s;
+}
+
+.piloto-item .ganhou:hover {
+    color: #218838;
+}
+
+.piloto-item .perdeu {
+    background: none;
+    border: none;
+    color: #dc3545; /* Vermelho */
+    cursor: pointer;
+    font-size: 18px;
+    transition: color 0.3s;
+}
+
+.piloto-item .perdeu:hover {
+    color: #c82333;
+}
+
+.shark-tank-item .ganhou {
+    background: none;
+    border: none;
+    color: #28a745; /* Verde */
+    cursor: pointer;
+    font-size: 18px;
+    transition: color 0.3s;
+}
+
+.shark-tank-item .ganhou:hover {
+    color: #218838;
+}
+
+.shark-tank-item .perdeu {
+    background: none;
+    border: none;
+    color: #dc3545; /* Vermelho */
+    cursor: pointer;
+    font-size: 18px;
+    transition: color 0.3s;
+}
+
+.shark-tank-item .perdeu:hover {
+    color: #c82333;
+}
+
+/* Media Queries para telas menores */
 @media (max-width: 768px) {
     .container {
-        flex-direction: column;
-        align-items: center;
+        grid-template-columns: 1fr; /* Uma coluna em telas pequenas */
+        height: auto; /* Permite altura automática em telas menores */
     }
 
-    .left, .right {
+    .left, .middle, .right {
         width: 100%;
+        height: auto;
     }
 
     .input-container, .button-container {
