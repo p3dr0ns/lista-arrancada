@@ -7,33 +7,26 @@ function adicionarPiloto() {
     }
 
     let pilotos = JSON.parse(localStorage.getItem('pilotos')) || [];
-    let sharkTank = JSON.parse(localStorage.getItem('sharkTank')) || [];
 
-    if (pilotos.includes(nomePiloto) || sharkTank.includes(nomePiloto)) {
+    if (pilotos.includes(nomePiloto)) {
         alert('Este piloto já está na lista.');
         return;
     }
 
-    if (pilotos.length < 10) {
-        pilotos.push(nomePiloto);
-        localStorage.setItem('pilotos', JSON.stringify(pilotos));
-    } else {
-        sharkTank.push(nomePiloto);
-        localStorage.setItem('sharkTank', JSON.stringify(sharkTank));
-    }
+    pilotos.push(nomePiloto);
+    localStorage.setItem('pilotos', JSON.stringify(pilotos));
 
     document.getElementById('nomePiloto').value = '';
     exibirPilotos();
-    exibirSharkTank();
 }
 
 // Função para remover piloto
 function removerPiloto(index) {
     let pilotos = JSON.parse(localStorage.getItem('pilotos')) || [];
-    pilotos.splice(index, 1);
+    pilotos.splice(index, 1); // Remove o piloto no índice especificado
     localStorage.setItem('pilotos', JSON.stringify(pilotos));
-    exibirPilotos();
-    exibirRodadas();
+    exibirPilotos(); // Atualiza a exibição da lista
+    exibirRodadas(); // Atualiza as rodadas
 }
 
 // Função para mover piloto para cima
@@ -54,26 +47,31 @@ function moverPilotoParaCima(index) {
 // Função para mover piloto para baixo
 function moverPilotoParaBaixo(index) {
     let pilotos = JSON.parse(localStorage.getItem('pilotos')) || [];
-    let sharkTank = JSON.parse(localStorage.getItem('sharkTank')) || [];
 
     if (index < pilotos.length - 1) {
-        // Move o piloto para baixo dentro da lista de pilotos
         [pilotos[index], pilotos[index + 1]] = [pilotos[index + 1], pilotos[index]];
-    } else if (index === pilotos.length - 1) {
-        // Se o piloto está em 10° lugar, mova-o para o último lugar no Shark Tank
-        const ultimoPiloto = pilotos.pop();
-        sharkTank.push(ultimoPiloto);
     }
 
     localStorage.setItem('pilotos', JSON.stringify(pilotos));
-    localStorage.setItem('sharkTank', JSON.stringify(sharkTank));
     exibirPilotos();
-    exibirSharkTank();
+}
+
+// Função para registrar o "rei da lista"
+function registrarRei(index) {
+    let pilotos = JSON.parse(localStorage.getItem('pilotos')) || [];
+    let reis = JSON.parse(localStorage.getItem('reis')) || {};
+
+    const piloto = pilotos[index];
+    reis[piloto] = (reis[piloto] || 0) + 1;
+
+    localStorage.setItem('reis', JSON.stringify(reis));
+    exibirPilotos();
 }
 
 // Função para exibir a lista de pilotos
 function exibirPilotos() {
     const pilotos = JSON.parse(localStorage.getItem('pilotos')) || [];
+    const reis = JSON.parse(localStorage.getItem('reis')) || {};
     const listaPilotosDiv = document.getElementById('listaPilotos');
     listaPilotosDiv.innerHTML = '<h2>Lista de Pilotos</h2>';
     pilotos.forEach((piloto, index) => {
@@ -81,10 +79,12 @@ function exibirPilotos() {
         div.className = 'piloto-item';
         div.innerHTML = `
             ${index + 1}. ${piloto} 
+            <span>(Rei: ${reis[piloto] || 0}x)</span>
             <div class="buttons">
                 <button class="ganhou" onclick="moverPilotoParaCima(${index})">Ganhou</button>
                 <button class="perdeu" onclick="moverPilotoParaBaixo(${index})">Perdeu</button>
                 <button class="remove" onclick="removerPiloto(${index})">X</button>
+                <button class="rei" onclick="registrarRei(${index})">👑 Rei</button>
             </div>
         `;
         listaPilotosDiv.appendChild(div);
@@ -136,10 +136,11 @@ function toggleConfiguracoes() {
 // Função para fazer backup dos dados
 function backup() {
     const pilotos = JSON.parse(localStorage.getItem('pilotos')) || [];
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(pilotos));
+    const data = { pilotos }; // Inclui pilotos no backup
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
     const downloadAnchorNode = document.createElement('a');
     downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", "backup_pilotos.json");
+    downloadAnchorNode.setAttribute("download", "backup_dados.json");
     document.body.appendChild(downloadAnchorNode);
     downloadAnchorNode.click();
     downloadAnchorNode.remove();
@@ -154,10 +155,20 @@ function restaurar() {
         const file = event.target.files[0];
         const reader = new FileReader();
         reader.onload = e => {
-            const pilotos = JSON.parse(e.target.result);
-            localStorage.setItem('pilotos', JSON.stringify(pilotos));
-            exibirPilotos();
-            exibirRodadas(1);
+            try {
+                const data = JSON.parse(e.target.result);
+                if (data.pilotos) {
+                    // Restaura pilotos
+                    localStorage.setItem('pilotos', JSON.stringify(data.pilotos));
+                    exibirPilotos();
+                    exibirRodadas(1);
+                } else {
+                    alert('O arquivo de backup não é válido.');
+                }
+            } catch (error) {
+                console.error("Erro ao restaurar os dados:", error);
+                alert('Erro ao restaurar os dados. Certifique-se de que o arquivo é válido.');
+            }
         };
         reader.readAsText(file);
     };
@@ -188,74 +199,6 @@ function toggleTema() {
     }
 }
 
-// Função para mover piloto para cima no Shark Tank
-function moverParaCimaSharkTank(index) {
-    let pilotos = JSON.parse(localStorage.getItem('pilotos')) || [];
-    let sharkTank = JSON.parse(localStorage.getItem('sharkTank')) || [];
-
-    if (index === 0) {
-        // Se o piloto está no primeiro lugar do Shark Tank
-        const pilotoDoSharkTank = sharkTank.shift(); // Remove o primeiro piloto do Shark Tank
-        if (pilotos.length < 10) {
-            pilotos.push(pilotoDoSharkTank); // Adiciona o piloto ao final da lista de pilotos
-        } else {
-            // Troca o último piloto da lista de pilotos com o primeiro do Shark Tank
-            const ultimoPiloto = pilotos.pop(); // Remove o último piloto da lista de pilotos
-            pilotos.push(pilotoDoSharkTank); // Adiciona o piloto do Shark Tank ao final da lista de pilotos
-            sharkTank.unshift(ultimoPiloto); // Adiciona o último piloto da lista de pilotos ao início do Shark Tank
-        }
-    } else {
-        // Move o piloto para cima dentro do Shark Tank
-        [sharkTank[index], sharkTank[index - 1]] = [sharkTank[index - 1], sharkTank[index]];
-    }
-
-    localStorage.setItem('pilotos', JSON.stringify(pilotos));
-    localStorage.setItem('sharkTank', JSON.stringify(sharkTank));
-    exibirPilotos();
-    exibirSharkTank();
-}
-
-// Função para exibir a lista Shark Tank
-function exibirSharkTank() {
-    const sharkTank = JSON.parse(localStorage.getItem('sharkTank')) || [];
-    const sharkTankDiv = document.getElementById('sharkTank');
-    sharkTankDiv.innerHTML = '<h2>Shark Tank</h2>';
-    sharkTank.forEach((item, index) => {
-        const div = document.createElement('div');
-        div.className = 'shark-tank-item';
-        div.innerHTML = `
-            ${index + 1}. ${item}
-            <div class="buttons">
-                <button class="ganhou" onclick="moverParaCimaSharkTank(${index})">Ganhou</button>
-                <button class="perdeu" onclick="removerSharkTank(${index})">Perdeu</button>
-                <button class="remove" onclick="removerSharkTank(${index})">X</button>
-            </div>
-        `;
-        sharkTankDiv.appendChild(div);
-    });
-}
-
-// Função para mover piloto do Shark Tank para a lista de pilotos
-function moverParaPilotos(index) {
-    let pilotos = JSON.parse(localStorage.getItem('pilotos')) || [];
-    let sharkTank = JSON.parse(localStorage.getItem('sharkTank')) || [];
-
-    const piloto = sharkTank.splice(index, 1)[0];
-    pilotos.push(piloto); // Adiciona o piloto à lista, mesmo que já esteja cheia
-    localStorage.setItem('pilotos', JSON.stringify(pilotos));
-    localStorage.setItem('sharkTank', JSON.stringify(sharkTank));
-    exibirPilotos();
-    exibirSharkTank();
-}
-
-// Função para remover piloto do Shark Tank
-function removerSharkTank(index) {
-    let sharkTank = JSON.parse(localStorage.getItem('sharkTank')) || [];
-    sharkTank.splice(index, 1);
-    localStorage.setItem('sharkTank', JSON.stringify(sharkTank));
-    exibirSharkTank();
-}
-
 // Função para compartilhar no WhatsApp
 function compartilharWhatsApp() {
     const pilotos = JSON.parse(localStorage.getItem('pilotos')) || [];
@@ -265,10 +208,45 @@ function compartilharWhatsApp() {
     window.open(url, '_blank');
 }
 
-// Chama a função para exibir a lista de pilotos, Shark Tank e as rodadas quando a página carrega
+// Função para compartilhar a lista final de pilotos
+function compartilharListaFinal() {
+    const pilotos = JSON.parse(localStorage.getItem('pilotos')) || [];
+    const reis = JSON.parse(localStorage.getItem('reis')) || {};
+
+    if (pilotos.length === 0) {
+        alert('A lista de pilotos está vazia.');
+        return;
+    }
+
+    const mensagem = pilotos
+        .map((piloto, index) => {
+            const reiBadge = reis[piloto] ? ` 🏆${reis[piloto]}x` : ''; // Adiciona o troféu se for rei
+            return `${index + 1}. ${piloto}${reiBadge}`;
+        })
+        .join('\n');
+
+    const url = `https://wa.me/?text=${encodeURIComponent(`🏁 Lista de Pilotos 🏁\n\n${mensagem}`)}`;
+    window.open(url, '_blank');
+}
+
+// Ajuste para localStorage na hospedagem do GitHub
+function verificarLocalStorage() {
+    console.log("Verificando localStorage...");
+    if (!localStorage.getItem('pilotos')) {
+        console.log("Inicializando 'pilotos' no localStorage.");
+        localStorage.setItem('pilotos', JSON.stringify([]));
+    }
+    if (!localStorage.getItem('tema')) {
+        console.log("Inicializando 'tema' no localStorage.");
+        localStorage.setItem('tema', 'light');
+    }
+    console.log("localStorage verificado:", localStorage);
+}
+
+// Chama a função para inicializar o localStorage e exibir os dados
 window.onload = function() {
+    verificarLocalStorage(); // Inicializa o localStorage se necessário
     aplicarTemaSalvo(); // Aplica o tema salvo
     exibirPilotos();
-    exibirSharkTank(); // Exibe a lista Shark Tank
     exibirRodadas(1);
 };
